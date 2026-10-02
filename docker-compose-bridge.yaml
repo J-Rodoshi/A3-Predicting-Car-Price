@@ -1,0 +1,9 @@
+services:
+  web:
+    image: jarin19/car-price-app-a3:latest
+    network_mode: bridge
+    ports:
+      - "8126:80"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=80

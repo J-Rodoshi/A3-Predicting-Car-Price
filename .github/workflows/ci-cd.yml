@@ -38,8 +38,11 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/car-price-app-a3:latest
 
-      # Deploy to the CSIM VM (ml.brain.cs.ait.ac.th), which is reached
-      # through the jump host bazooka.cs.ait.ac.th.
+      # Deploy to the CSIM VM (ml.brain.cs.ait.ac.th) through the jump host
+      # bazooka.cs.ait.ac.th. The Traefik compose file (docker-compose-deploy.yaml)
+      # currently cannot start containers because the VM's Docker Swarm certificate
+      # has expired, so we deploy with docker-compose-bridge.yaml (default bridge
+      # network, published port 8126) instead.
       # Secrets needed: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
       - name: Deploy on the server
         env:
@@ -65,5 +68,5 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
           ssh ml "mkdir -p ~/a3"
-          scp docker-compose-deploy.yaml ml:~/a3/
-          ssh ml "cd ~/a3 && docker compose -f docker-compose-deploy.yaml pull && docker compose -f docker-compose-deploy.yaml up -d"
+          scp docker-compose-bridge.yaml ml:~/a3/
+          ssh ml "cd ~/a3 && docker compose -f docker-compose-bridge.yaml pull && docker compose -f docker-compose-bridge.yaml up -d"
