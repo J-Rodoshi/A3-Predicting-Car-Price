@@ -66,4 +66,4 @@ jobs:
           chmod 600 ~/.ssh/config
           ssh ml "mkdir -p ~/a3"
           scp docker-compose-deploy.yaml ml:~/a3/
-          ssh ml "cd ~/a3 && docker compose -f docker-compose-deploy.yaml pull && docker compose -f
+          ssh ml "cd ~/a3 && docker compose -f docker-compose-deploy.yaml pull && docker compose -f docker-compose-deploy.yaml up -d"
