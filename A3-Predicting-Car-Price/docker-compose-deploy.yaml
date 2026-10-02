@@ -1,6 +1,5 @@
 services:
   web:
-    command: python3 /root/code/app.py
     #command: python app.py
     # command: tail -f /dev/null
     image: jarin19/car-price-app-a3:latest
