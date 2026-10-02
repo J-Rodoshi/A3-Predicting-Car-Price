@@ -1,0 +1,383 @@
+/* ============================================================
+   Design tokens
+   ============================================================ */
+:root {
+  --bg: #eef2f4;
+  --bg-2: #e2e9ee;
+  --card: #ffffff;
+  --ink: #0f1e26;
+  --muted: #5a6b75;
+  --line: #d3dde3;
+
+  --accent: #0b6e6e;
+  --accent-2: #14a3a3;
+  --accent-ink: #ffffff;
+
+  --band: #e3eaee;
+  --error: #b3261e;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 2px rgba(15, 30, 38, .06), 0 2px 8px rgba(15, 30, 38, .05);
+  --shadow-md: 0 8px 24px rgba(15, 30, 38, .08), 0 2px 6px rgba(15, 30, 38, .05);
+  --shadow-lg: 0 20px 50px rgba(11, 110, 110, .18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a1218;
+    --bg-2: #0e1a21;
+    --card: #14212a;
+    --ink: #e8eef2;
+    --muted: #93a6b1;
+    --line: #263945;
+    --accent: #4fc3c3;
+    --accent-2: #6ee7e7;
+    --accent-ink: #06202a;
+    --band: #1d2c36;
+    --error: #ff8a80;
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, var(--bg-2), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, var(--bg-2), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+.page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 4rem 1.25rem 5rem;
+  animation: fade-up .5s ease both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   Header  — hides original text, swaps in friendly copy
+   ============================================================ */
+header { margin-bottom: 2rem; }
+
+header h1 {
+  font-size: 0;                          /* hide original text */
+  letter-spacing: -0.02em;
+  margin: 0 0 .7rem;
+  background: linear-gradient(90deg, var(--ink), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fade-up .5s ease both;
+}
+header h1::before {
+  content: "How much is my car worth?";
+  display: block;
+  font: 800 clamp(1.75rem, 4.5vw, 2.5rem)/1.1 Georgia, "Times New Roman", serif;
+}
+header h1::after {
+  content: "";
+  display: block;
+  width: 44px; height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  margin-top: 1rem;
+}
+
+header p {
+  font-size: 0;                          /* hide original text */
+  margin: 0;
+  color: var(--muted);
+  max-width: 34rem;
+  animation: fade-up .55s ease both;
+}
+header p::before {
+  content: "Tell us a few things about your car and we'll estimate the price range it belongs to.";
+  display: block;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   Card
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  animation: fade-up .6s ease both;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), transparent);
+  opacity: .9;
+}
+
+/* ============================================================
+   Form
+   ============================================================ */
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem 1.1rem;
+}
+.full { grid-column: 1 / -1; }
+
+label {
+  display: grid;
+  gap: .4rem;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .01em;
+}
+
+label small {
+  font-weight: 500;
+  font-size: .8rem;
+  color: var(--muted);
+  margin-top: -.2rem;
+}
+
+/* Friendly helper hints under each label.
+   ::before on the label is the first grid item — so it sits
+   above the label text. Small hack: give it order: -1 and
+   use it as a tooltip-like line below by reordering. Instead
+   we use ::after which lands after the input. */
+label::after {
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--muted);
+  opacity: .85;
+  margin-top: .25rem;
+}
+
+/* Hint text per field — targeted by position */
+form > label:nth-child(1)::after { content: "Which company makes it?"; }
+form > label:nth-child(2)::after { content: "Petrol, diesel, or other"; }
+form > label:nth-child(3)::after { content: "Example: 2017"; }
+form > label:nth-child(4)::after { content: "Usually 50 to 200"; }
+form > label:nth-child(5)::after { content: "Usually 10 to 25"; }
+
+input, select {
+  font: inherit;
+  font-weight: 500;
+  padding: .8rem .9rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  width: 100%;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+input:hover, select:hover { border-color: var(--muted); }
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent);
+  background: var(--card);
+}
+
+select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.2rem;
+}
+
+/* ============================================================
+   Button  — original text "Predict price class" replaced
+   ============================================================ */
+button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 0;                     /* hide original label */
+  letter-spacing: .01em;
+  padding: 1rem 1rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+}
+button::before {
+  content: "Estimate my car's price";
+  display: inline-block;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+  filter: brightness(1.05);
+}
+button:active { transform: translateY(0); }
+
+/* ============================================================
+   Result
+   ============================================================ */
+.result {
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px dashed var(--line);
+  animation: fade-up .4s ease both;
+  text-align: center;
+}
+
+/* "Predicted: Class N"  →  big friendly headline */
+.result h2 {
+  font-size: 0;                     /* hide original text */
+  margin: 0 0 1rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+.result h2::before {
+  content: "Your car's estimated price range";
+  display: block;
+  font-size: .78rem;
+  margin-bottom: .8rem;
+  color: var(--muted);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.result h2 strong {
+  display: block;
+  font-size: 0;                     /* hide "Class N" */
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-transform: none;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.result h2 strong::before {
+  display: block;
+  font: 800 clamp(2rem, 6vw, 2.8rem)/1.1 Georgia, "Times New Roman", serif;
+}
+
+/* Friendly label — depends on which band is .active */
+.result:has(.band.active:nth-child(1)) h2 strong::before { content: "Budget"; }
+.result:has(.band.active:nth-child(2)) h2 strong::before { content: "Affordable"; }
+.result:has(.band.active:nth-child(3)) h2 strong::before { content: "Premium"; }
+.result:has(.band.active:nth-child(4)) h2 strong::before { content: "Luxury"; }
+
+/* ============================================================
+   Band scale  — "Class N" tiles → Budget / Affordable / etc.
+   ============================================================ */
+.scale {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scale::before {
+  content: "All four price ranges";
+  display: block;
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+.band {
+  background: var(--band);
+  border-radius: var(--radius-sm);
+  padding: .85rem .5rem;
+  text-align: center;
+  font-size: .8rem;
+  line-height: 1.35;
+  color: var(--muted);
+  border: 2px solid transparent;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.band b {
+  display: block;
+  font-size: 0;                     /* hide "Class N" */
+  margin-bottom: .2rem;
+}
+.band b::before {
+  display: block;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.band:nth-child(1) b::before { content: "Budget"; }
+.band:nth-child(2) b::before { content: "Affordable"; }
+.band:nth-child(3) b::before { content: "Premium"; }
+.band:nth-child(4) b::before { content: "Luxury"; }
+
+.band.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.band.active b::before { color: var(--accent-ink); }
+
+/* ============================================================
+   Error
+   ============================================================ */
+.error {
+  margin-top: 1.25rem;
+  padding: .75rem .9rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--error) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--error) 35%, transparent);
+  color: var(--error);
+  font-weight: 600;
+  animation: fade-up .25s ease both;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 30rem) {
+  .page { padding: 2.5rem 1rem 3.5rem; }
+  form  { grid-template-columns: 1fr; }
+  .scale { grid-template-columns: 1fr 1fr; }
+  .card  { padding: 1.25rem; }
+}

@@ -1,0 +1,69 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # 1) Continuous integration: run the unit tests on every push / PR
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install test dependencies
+        run: pip install numpy pytest      # the tests only need these two
+      - name: Run unit tests
+        run: pytest app/tests -v
+
+  # 2) Continuous deployment: only runs if `test` passed, and only on main
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/car-price-app-a3:latest
+
+      # Deploy to the CSIM VM (ml.brain.cs.ait.ac.th), which is reached
+      # through the jump host bazooka.cs.ait.ac.th.
+      # Secrets needed: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
+      - name: Deploy on the server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat > ~/.ssh/config <<EOF
+          Host bazooka
+              HostName bazooka.cs.ait.ac.th
+              User $SSH_USER
+              IdentityFile ~/.ssh/deploy_key
+              StrictHostKeyChecking accept-new
+          Host ml
+              HostName $SSH_HOST
+              User $SSH_USER
+              IdentityFile ~/.ssh/deploy_key
+              ProxyJump bazooka
+              StrictHostKeyChecking accept-new
+          EOF
+          chmod 600 ~/.ssh/config
+          ssh ml "mkdir -p ~/a3"
+          scp docker-compose-deploy.yaml ml:~/a3/
+          ssh ml "cd ~/a3 && docker compose -f docker-compose-deploy.yaml pull && docker compose -f

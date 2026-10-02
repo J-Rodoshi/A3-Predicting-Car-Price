@@ -1,0 +1,6 @@
+services:
+  web:
+    build: .
+    image: jarin19/car-price-app-a3:latest
+    ports:
+      - "8080:80"

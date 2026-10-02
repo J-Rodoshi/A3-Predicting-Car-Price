@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Car price class</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>Which price class is this car?</h1>
+      <p>Enter a car's details and the model places it in one of four price classes, from 0 (lowest) to 3 (highest).</p>
+    </header>
+
+    <section class="card">
+      <form method="post">
+        <label>Brand
+          <select name="brand">{% for b in brands %}<option {{ 'selected' if form.get('brand') == b }}>{{ b }}</option>{% endfor %}</select>
+        </label>
+        <label>Fuel
+          <select name="fuel">{% for f in fuels %}<option {{ 'selected' if form.get('fuel') == f }}>{{ f }}</option>{% endfor %}</select>
+        </label>
+        <label>Year
+          <input name="year" type="number" step="1" value="{{ form.get('year', '2015') }}" required>
+        </label>
+        <label>Max power <small>bhp</small>
+          <input name="max_power" type="number" step="any" value="{{ form.get('max_power', '80') }}" required>
+        </label>
+        <label class="full">Mileage <small>kmpl</small>
+          <input name="mileage" type="number" step="any" value="{{ form.get('mileage', '18') }}" required>
+        </label>
+        <button class="full" type="submit">Predict price class</button>
+      </form>
+
+      {% if pred is not none %}
+      <div class="result" role="status">
+        <h2>Predicted: <strong>Class {{ pred }}</strong></h2>
+        <ol class="scale">
+          {% for band in bands %}
+          <li class="band {{ 'active' if band.index == pred }}">
+            <b>Class {{ band.index }}</b>{{ band.range }}
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    </section>
+  </main>
+</body>
+</html>
